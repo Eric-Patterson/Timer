@@ -1,74 +1,32 @@
-class Timer{
-    constructor(durationInput, startButton, pauseButton, callbacks) {
-        this.durationInput = durationInput;
-        this.startButton = startButton;
-        this.pauseButton = pauseButton;
-        if(callbacks) {
-            this.onStart = callbacks.onStart;
-            this.onTick = callbacks.onTick;
-            this.onComplete = callbacks.onComplete;
-        }
-        // eventlistener to start button || this.startButton is what determins the button.
-        this.startButton.addEventListener('click', this.start);
-        this.pauseButton.addEventListener('click', this.pause);
-    }
-
-    start = () =>{
-        if(this.onStart){
-            this.onStart();
-        }
-        // manually runs one tick, then after runs a tick every one interval
-        this.tick();
-        // run this.tick interval every 1 second after start is pressed
-        this.interval = setInterval(this.tick, 1000);
-    };
-
-    pause = () =>{
-        // to have access from the timer variable above, we give it this.timer
-        // otherwise we would not have access to it in the pause function
-        clearInterval(this.interval);
-    };
-
-    tick = () =>{
-        if(this.timeRemaining <= 0){
-            this.pause();
-            if(this.onComplete){
-                this.onComplete();
-            }
-        } else{
-        // we are calling the getter to retrieve the value in the this.timeRemaining -1;
-        // then we call the setter in the this.timeRemaining to whenever we want to set the value
-        this.timeRemaining = this.timeRemaining - 1;
-        if(this.onTick){
-            this.onTick();
-        }
-        }
-        // parseFloat = converts string to number
-        // const timeRemaining = parseFloat(this.durationInput.value);
-        // this.durationInput.value = timeRemaining - 1;
-    };
-
-    get timeRemaining() {
-        return parseFloat(this.durationInput.value);
-    }
-
-    set timeRemaining (time) {
-        this.durationInput.value = time;
-    }
-}
-
 const durationInput = document.querySelector('#duration');
 const startButton = document.querySelector('#start');
 const pauseButton = document.querySelector('#pause');
+const refreshButton = document.querySelector('#refresh');
 
-const timer = new Timer(durationInput, startButton, pauseButton, {
-    onStart(){
-        console.log('Timer started');
+const circle = document.querySelector('circle');
+
+// find the perim of the circle
+const perimeter = circle.getAttribute('r') * 2 * Math.PI;
+circle.setAttribute('stroke-dasharray', perimeter);
+
+let duration;
+
+const timer = new Timer(durationInput, startButton, pauseButton, refreshButton,  {
+    onStart(totalDuration){
+        // console.log('Timer started');
+        duration = totalDuration;
+        
     },
-    onTick(){
-        console.log('Timer ticked down');
+    onTick(timeRemaining){
+        // console.log('Timer ticked down');
+        // circle.setAttribute('stroke-dashoffset', currentOffset)
+        // currentOffset -= 1;
+        circle.setAttribute('stroke-dashoffset', 
+        perimeter * timeRemaining / duration - perimeter
+        );
+        
     },
     onComplete(){
-        console.log('Timer completed');
+        // console.log('Timer completed');
     }
 });
